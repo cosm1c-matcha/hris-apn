@@ -1,0 +1,81 @@
+stages:
+  - build
+  - release
+
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: never
+    - when: always
+
+default:
+  image: eclipse-temurin:21-jdk
+  cache:
+    key: "gradle-$CI_COMMIT_REF_SLUG"
+    paths:
+      - .gradle/caches
+      - .gradle/wrapper
+  before_script:
+    - chmod +x ./gradlew
+    - |
+      if [ -z "${GPR_KEY:-}" ]; then
+        echo "ERROR: GPR_USER and GPR_KEY must be set as masked CI/CD variables."
+        echo "The Morphe Gradle plugin is hosted on GitHub Packages and needs a"
+        echo "classic GitHub PAT with the read:packages scope."
+        exit 1
+      fi
+      mkdir -p "$GRADLE_USER_HOME"
+      printf 'gpr.user=%s\ngpr.key=%s\n' "$GPR_USER" "$GPR_KEY" > "$GRADLE_USER_HOME/gradle.properties"
+      chmod 600 "$GRADLE_USER_HOME/gradle.properties"
+
+variables:
+  GRADLE_USER_HOME: "$CI_PROJECT_DIR/.gradle"
+  GIT_DEPTH: "0"
+  GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx3g -Dorg.gradle.daemon=false"
+
+build:
+  stage: build
+  script:
+    - |
+      if [ -n "${CI_COMMIT_TAG:-}" ]; then
+        VERSION="${CI_COMMIT_TAG#v}"
+        ./gradlew :patches:build -Pversion="$VERSION" --no-daemon --console=plain
+      else
+        ./gradlew :patches:build --no-daemon --console=plain
+      fi
+    - ./gradlew generatePatchesList --no-daemon --console=plain || true
+  artifacts:
+    expire_in: 1 week
+    paths:
+      - patches/build/libs/*.mpp
+      - patches-list.json
+
+release:
+  stage: release
+  needs: [build]
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^v?\d+\.\d+\.\d+$/'
+  script:
+    - MPP="$(ls patches/build/libs/patches-*.mpp | head -n1)"
+    - echo "Uploading $MPP as patches-$CI_COMMIT_TAG.mpp"
+    - |
+      curl --fail --silent --show-error \
+        --header "JOB-TOKEN: $CI_JOB_TOKEN" \
+        --upload-file "$MPP" \
+        "$CI_API_V4_URL/projects/$CI_PROJECT_ID/packages/generic/hris-apn/$CI_COMMIT_TAG/patches-$CI_COMMIT_TAG.mpp"
+  release:
+    tag_name: "$CI_COMMIT_TAG"
+    name: "hris-apn $CI_COMMIT_TAG"
+    description: |
+      Morphe patch bundle for **AgriConnect** (`com.git.agriconnect`, version 1.0.2).
+
+      - **Disable mock GPS detection** (bytecode, default enabled)
+      - **Disable mock GPS detection (JS fallback)** (resource, optional)
+
+      See the [README](https://gitlab.com/secre-swallowtail/hris-apn/-/blob/main/README.md)
+      for the traced detection flow and installation notes.
+    assets:
+      links:
+        - name: "patches-$CI_COMMIT_TAG.mpp"
+          url: "$CI_API_V4_URL/projects/$CI_PROJECT_ID/packages/generic/hris-apn/$CI_COMMIT_TAG/patches-$CI_COMMIT_TAG.mpp"
+          link_type: "package"
