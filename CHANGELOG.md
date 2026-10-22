@@ -1,3 +1,9 @@
+## [1.0.1](https://github.com/cosm1c-matcha/hris-apn/compare/v1.0.0...v1.0.1) (2026-10-22)
+
+### 🐛 Bug Fixes
+
+* **ci:** drop backmerge step for single-branch repo ([89dcb5d](https://github.com/cosm1c-matcha/hris-apn/commit/89dcb5d683087e55f3d4839721f1c0f158888949))
+
 ## 1.0.0 (2026-10-22)
 
 ### 🐛 Bug Fixes
