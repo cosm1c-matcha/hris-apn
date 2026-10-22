@@ -85,7 +85,7 @@ To generate `patches-list.json` locally:
 1. Build the `.mpp` (or download it from a release).
 2. In Morphe Manager: **Settings → Expert settings → enable Expert mode**, then add this
    repository as a patch source:
-   `https://github.com/secre-swallowtail-red/hris-apn`
+   `https://gitlab.com/secre-swallowtail/hris-apn`
 3. Select AgriConnect `1.0.2`, enable **Disable mock GPS detection**, patch and install.
 
 The patched APK is re-signed, so uninstall the Play Store build first.

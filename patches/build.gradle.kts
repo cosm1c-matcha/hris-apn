@@ -4,7 +4,7 @@ patches {
     about {
         name = "HRIS APN patches"
         description = "Patches for AgriConnect (com.git.agriconnect)"
-        source = "https://github.com/secre-swallowtail-red/hris-apn"
+        source = "https://gitlab.com/secre-swallowtail/hris-apn"
         author = "Secre Swallowtail"
         contact = "na"
         website = "na"
