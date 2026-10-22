@@ -77,7 +77,7 @@ To generate `patches-list.json` locally:
 ```
 
 > Morphe's Gradle plugin (`app.morphe.patches`) is hosted on GitHub Packages, so a
-> GitHub authentication token is required even though this repository is on GitLab.
+> GitHub authentication token is required to resolve it.
 > Create a **classic** PAT with the `read:packages` scope and set it in
 > `~/.gradle/gradle.properties`:
 
@@ -91,43 +91,37 @@ gpr.key=ghp_xxxxxxxxxxxxxxxxxxxx
 ## 📦 Installing
 
 1. Download the `.mpp` from
-   [Releases](https://gitlab.com/secre-swallowtail/hris-apn/-/releases)
+   [Releases](https://github.com/cosm1c-matcha/hris-apn/releases)
    (or build it locally).
-2. In Morphe Manager: **Settings → Expert settings → enable Expert mode**, then add the
-   patch bundle. If your Morphe build does not accept a GitLab repository URL directly,
-   import/download the `.mpp` and add it as a local patch bundle.
+2. In Morphe Manager: **Settings → Expert settings → enable Expert mode**, then add this
+   repository as a patch source or import the `.mpp` as a local patch bundle.
 3. Select AgriConnect `1.0.2`, enable **Disable mock GPS detection**, patch and install.
 
 The patched APK is re-signed, so uninstall the Play Store build first.
 
 ## 🔁 CI/CD
 
-`.gitlab-ci.yml` builds the bundle on every branch and publishes a GitLab Release when a
-version tag is pushed.
+`.github/workflows/release.yml` builds and publishes the bundle with semantic-release.
+Add these repository secrets (Settings → Secrets and variables → Actions), both masked:
 
-Required CI/CD variables (Settings → CI/CD → Variables), both **masked**:
-
-| Variable | Value |
+| Secret | Value |
 |---|---|
 | `GPR_USER` | GitHub username that owns the PAT |
 | `GPR_KEY` | classic GitHub PAT with `read:packages` |
 
-They are only used to download the Morphe Gradle plugin; they are written to the runner's
-temporary `GRADLE_USER_HOME` and are not committed.
+They are only used to download the Morphe Gradle plugin; the workflow writes them to a
+temporary `~/.gradle/gradle.properties` and they are never committed.
 
 Release flow:
 
 ```bash
-# Bump the version if needed, then tag and push
-git tag v1.0.0
-git push origin v1.0.0
+# Bump the version if needed, then push a conventional commit to main.
+git commit -m "fix: ..."
+git push origin main
 ```
 
-The pipeline builds `patches-1.0.0.mpp` (the tag is passed as `-Pversion=`), uploads it to
-the generic package registry, and creates a release with the `.mpp` attached.
-
-Branch pipelines run the build only and keep the `.mpp` + `patches-list.json` as artifacts
-for one week.
+Semantic-release reads the conventional commits, bumps `gradle.properties`, publishes a
+GitHub Release and attaches `patches-<version>.mpp`.
 
 ### Notes
 
