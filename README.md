@@ -34,10 +34,22 @@ will either keep matching or fail loudly instead of silently mis-patching.
 ## 🩹 Patches list
 
 <!-- PATCHES_START EXPANDED -->
+> **[v1.0.0](https://github.com/cosm1c-matcha/hris-apn/releases/tag/v1.0.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;2 patches total
+<details open>
+<summary>📦 AgriConnect&nbsp;&nbsp;•&nbsp;&nbsp;2 patches</summary>
+<br>
 
-<!-- Do not modify this section by hand. The patch list is generated when release.yml creates a new release. -->
+**🎯 Supported versions:**
 
-#### A list of the patches will automatically be shown here after the first release is created.
+| 1.0.2 |
+| :---: |
+
+| 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
+|----------|----------------|-----------|
+| [Disable mock GPS detection](#disable-mock-gps-detection) | Forces the background-geolocation 'simulated' flag to false so the check-in/out mock-location guard never blocks submission. |  |
+| [Disable mock GPS detection (JS fallback)](#disable-mock-gps-detection-js-fallback) | Neutralises the isMockLocation assignment in the check-in/out web bundle. |  |
+
+</details>
 
 <!-- PATCHES_END -->
 
