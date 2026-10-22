@@ -39,7 +39,7 @@ will either keep matching or fail loudly instead of silently mis-patching.
 
 #### A list of the patches will automatically be shown here after the first release is created.
 
-&nbsp;
+<!-- PATCHES_END -->
 
 ## 🔍 How the detection works
 
